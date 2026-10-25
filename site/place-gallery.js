@@ -13,7 +13,7 @@ const places=[
  ['pasar','Pasar Skouw (Blok D)',590,288,212,83,.28],['rumah-dinas','Rumah Dinas',1180,242,170,65,.41],
  ['mess','Mess Pegawai',1190,356,220,75,.43],['gereja','Gereja PLBN Skouw',995,409,205,71,.45],
  ['polsubsektor','Polsubsektor Skouw Perbatasan RI–PNG',200,335,247,73,.84],
- ['terminal','Terminal Barang Internasional RI–PNG',300,682,320,80,.855],['gudang','Gudang',705,738,180,79,.87],
+ ['terminal','Terminal Barang Internasional RI–PNG',300,682,320,80,.855],
  ['zona-inti','Zona Inti',1740,324,280,123,.59],['barak-tni','Barak TNI',1370,780,255,106,.755]
 ];
 const layer=document.createElement('div');layer.className='place-hotspots';
