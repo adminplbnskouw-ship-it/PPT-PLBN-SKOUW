@@ -91,7 +91,7 @@ function mode() {
 opening=scrub($('#openingVideo'));building=scrub($('#mainVideo'));
 toggle.addEventListener('click',()=>{
   if(reduced.matches){paused=true;toggle.textContent='Membaca tanpa animasi';return;}
-  const map=paused?document.querySelector(heldSectionId||'#zonasi'):['#zonasi','#pegawai','#perdagangan','#negara','#permasalahan','#air-bersih','#terminal-barang','#pengembangan-ekonomi','#konektivitas','#sistem-pembayaran','#edukasi-perbatasan'].map(id=>document.querySelector(id)).find(el=>{if(!el)return false;const r=el.getBoundingClientRect();return r.top<=0&&r.bottom>=innerHeight;});
+  const map=paused?document.querySelector(heldSectionId||'#zonasi'):['#zonasi','#pegawai','#perdagangan','#negara','#pelayanan','#keimigrasian','#permasalahan','#air-bersih','#terminal-barang','#pengembangan-ekonomi','#konektivitas','#sistem-pembayaran','#edukasi-perbatasan'].map(id=>document.querySelector(id)).find(el=>{if(!el)return false;const r=el.getBoundingClientRect();return r.top<=0&&r.bottom>=innerHeight;});
   if(!paused){
     heldProgress=progress();heldMapProgress=null;heldSectionId=map?'#'+map.id:null;
     if(map){const r=map.getBoundingClientRect();if(r.top<=0&&r.bottom>=innerHeight)heldMapProgress=clamp(-r.top/Math.max(1,map.offsetHeight-innerHeight));}
