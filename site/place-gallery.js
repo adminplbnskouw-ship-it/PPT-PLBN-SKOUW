@@ -1,5 +1,11 @@
 (() => {
 'use strict';
+const staticPhotos=true;
+let photoManifest;
+async function getPhotos(id,cursor,signal){
+ if(staticPhotos){if(!photoManifest)photoManifest=await responseJSON(await fetch('place-photos.json?v=hover-1',{cache:'no-store'}));return {photos:photoManifest[id]||[],cursor:null};}
+ const suffix=cursor?'?cursor='+encodeURIComponent(cursor):'';return responseJSON(await fetch('/api/places/'+id+suffix,{signal,cache:'no-store'}));
+}
 const section=document.querySelector('#zonasi'),canvas=section?.querySelector('.map-canvas');
 if(!canvas)return;
 const places=[
@@ -20,13 +26,15 @@ dialog.innerHTML='<div class="place-dialog-head"><div><p class="place-eyebrow">G
 document.body.append(dialog);
 const select=dialog.querySelector('select'),input=dialog.querySelector('input'),status=dialog.querySelector('.place-status'),grid=dialog.querySelector('.place-grid'),more=dialog.querySelector('.place-more');
 places.forEach(([id,name])=>select.add(new Option(name,id)));
+if(staticPhotos){const manage=document.createElement('a');manage.className='place-manage';manage.textContent='Tambah / kelola foto';manage.target='_blank';manage.rel='noopener';dialog.querySelector('.place-upload').replaceWith(manage);dialog.querySelector('.place-gallery-actions p').textContent='Foto tampil di halaman ini. Foto baru ditambahkan lewat website pengelola, lalu perlu disinkronkan ke GitHub Pages.';}
+window.skouwGallery={getPhotos,open};
 let active='',cursor=null,loading=null,previousOverflow='',trigger=null,busy=false;
 section.addEventListener('mapprogress',e=>{for(const button of layer.children)button.disabled=e.detail<Number(button.dataset.at);});
 async function responseJSON(response){const data=await response.json().catch(()=>({error:'Server belum dapat memproses foto.'}));if(!response.ok)throw new Error(data.error||'Foto belum dapat dimuat.');return data;}
 function appendPhotos(photos){for(const photo of photos){const a=document.createElement('a');a.className='place-photo';a.href=photo.url;a.target='_blank';a.rel='noopener';a.setAttribute('aria-label','Buka '+photo.name);const image=document.createElement('img');image.src=photo.url;image.alt=photo.name;image.loading='lazy';image.addEventListener('error',()=>{image.alt='Foto gagal dimuat. Klik untuk mencoba membuka foto.';});a.append(image);grid.append(a);}}
 async function load(append=false){loading?.abort();loading=new AbortController();const id=active;if(!append){grid.replaceChildren();cursor=null;}more.hidden=true;status.textContent='Memuat foto…';
-try{const suffix=append&&cursor?'?cursor='+encodeURIComponent(cursor):'';const data=await responseJSON(await fetch('/api/places/'+id+suffix,{signal:loading.signal,cache:'no-store'}));if(active!==id)return;appendPhotos(data.photos);cursor=data.cursor;more.hidden=!cursor;status.textContent=grid.children.length?grid.children.length+' foto · klik foto untuk membuka ukuran penuh.':'Belum ada foto untuk '+select.selectedOptions[0].textContent+'. Klik Tambah foto untuk mengisinya.';}catch(error){if(error.name!=='AbortError')status.textContent=error.message;}}
-function open(id){window.open("https://orbit-scroll-journey-241026.lushlyric64.chatgpt.site/?gallery="+encodeURIComponent(id)+"#zonasi","_blank","noopener");return;active=id;select.value=id;dialog.querySelector('h2').textContent=places.find(p=>p[0]===id)[1];if(!dialog.open){trigger=document.activeElement;previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal();}load();}
+try{const suffix=append&&cursor?'?cursor='+encodeURIComponent(cursor):'';const data=await getPhotos(id,append?cursor:null,loading.signal);if(active!==id)return;appendPhotos(data.photos);cursor=data.cursor;more.hidden=!cursor;status.textContent=grid.children.length?grid.children.length+' foto · klik foto untuk membuka ukuran penuh.':'Belum ada foto untuk '+select.selectedOptions[0].textContent+'. Klik Tambah foto untuk mengisinya.';}catch(error){if(error.name!=='AbortError')status.textContent=error.message;}}
+function open(id){active=id;if(staticPhotos)dialog.querySelector('.place-manage').href='https://orbit-scroll-journey-241026.lushlyric64.chatgpt.site/?gallery='+encodeURIComponent(id)+'#zonasi';select.value=id;dialog.querySelector('h2').textContent=places.find(p=>p[0]===id)[1];if(!dialog.open){trigger=document.activeElement;previousOverflow=document.body.style.overflow;document.body.style.overflow='hidden';dialog.showModal();}load();}
 dialog.querySelector('.place-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
 dialog.addEventListener('close',()=>{loading?.abort();document.body.style.overflow=previousOverflow;trigger?.focus({preventScroll:true});});
 select.addEventListener('change',()=>open(select.value));more.addEventListener('click',()=>load(true));
@@ -36,4 +44,6 @@ try{for(const file of files){status.textContent='Menyimpan foto '+(saved+1)+' da
 catch(error){status.textContent=(saved?saved+' foto sudah tersimpan. ':'')+error.message;}
 finally{busy=false;input.disabled=false;select.disabled=false;}
 });
+const requestedPlace=new URLSearchParams(location.search).get('gallery');
+if(places.some(p=>p[0]===requestedPlace))open(requestedPlace);
 })();
