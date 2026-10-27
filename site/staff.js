@@ -3,9 +3,6 @@
 const section=document.querySelector('#pegawai');
 if(!section)return;
 const reveals=[...section.querySelectorAll('.staff-reveal')];
-const ring=document.querySelector('#staff-ring-progress');
-const center=document.querySelector('#staff-center-image');
-const connectors=document.querySelector('#staff-connectors-layer');
 const final=document.querySelector('#staff-final');
 const visual=section.querySelector('.staff-visual');
 const status=document.querySelector('#staff-status');
@@ -22,25 +19,22 @@ function render(){
 queued=false;
 const p=still()?1:clamp((scrollY-layout.top)/layout.travel);
 reveals.forEach(el=>{const t=ease(range(p,Number(el.dataset.a),Number(el.dataset.b)));el.style.opacity=String(t);el.setAttribute('transform','translate('+((1-t)*Number(el.dataset.dx)).toFixed(3)+' '+((1-t)*Number(el.dataset.dy)).toFixed(3)+')');});
-ring.style.strokeDashoffset=String(1-ease(range(p,.18,.54)));
-center.style.opacity=String(ease(range(p,.28,.46)));
-connectors.style.opacity=String(ease(range(p,.13,.35)));
-const end=ease(range(p,.88,.94));
-final.style.opacity=String(end);visual.style.opacity=String(1-end);
-const phase=p<.12?0:p<.28?1:p<.54?2:p<.76?3:p<.88?4:5;
+const end=ease(range(p,.95,.98));
+final.style.opacity=String(end);visual.style.opacity=String(1-end);visual.style.display=end===1?'none':'block';
+const phase=p<.14?0:p<.38?1:p<.54?2:p<.73?3:p<.95?4:5;
 if(last!==phase){last=phase;const text=[
-['Komposisi Pegawai','PNS aktif, PPPK, dan P3K Paruh Waktu.'],
-['17 PNS aktif','56,7% dari total pegawai aktif PLBN Skouw.'],
-['30 pegawai aktif','17 PNS dan 13 Non-PNS. Non-PNS mencakup 43,3% dari total.'],
-['Rincian 13 Non-PNS','6 PPPK dan 7 P3K Paruh Waktu (P3KPW).'],
-['17 + 6 + 7 = 30 orang','Komposisi PNS, PPPK, dan P3K Paruh Waktu.'],
-['Total 30 pegawai aktif','17 PNS, 6 PPPK, dan 7 P3K Paruh Waktu.']
+['Komposisi Pegawai dan Petugas Pengelola','Pegawai internal, tenaga pendukung operasional, dan petugas CIQ di PLBN Skouw.'],
+['30 pegawai internal','17 PNS aktif, 6 PPPK, dan 7 P3K Paruh Waktu.'],
+['82 tenaga pendukung operasional','Tenaga Pendukung Operasional (TPO) mendukung operasional PLBN Skouw.'],
+['Kebersihan, teknisi, dan keamanan','46 petugas kebersihan, 8 teknisi, dan 28 petugas keamanan.'],
+['Petugas CIQ di PLBN Skouw','Bea dan Cukai 8 orang; Imigrasi 21 orang; Karantina Kesehatan 8 orang; Karantina Hewan, Ikan dan Tumbuhan 6 orang.'],
+['Komposisi pegawai dan petugas lengkap','30 pegawai internal dan 82 TPO, serta rincian petugas CIQ di PLBN Skouw.']
 ][phase];title.textContent=text[0];detail.textContent=text[1];}
-status.textContent=p>=.94?'Komposisi lengkap · lanjut scroll ↓':'Scroll untuk menampilkan komposisi pegawai ↓';
+status.textContent=p>=.98?'Komposisi lengkap · lanjut scroll ↓':'Scroll untuk menampilkan komposisi pegawai dan petugas ↓';
 }
 function schedule(){if(!queued){queued=true;requestAnimationFrame(render);}}
 document.querySelector('#staff-replay').addEventListener('click',e=>{e.preventDefault();measure();window.scrollTo({top:layout.top,behavior:'instant'});render();});
-document.querySelector('#staff-complete').addEventListener('click',e=>{e.preventDefault();measure();window.scrollTo({top:layout.top+layout.travel*.97,behavior:'instant'});render();});
+document.querySelector('#staff-complete').addEventListener('click',e=>{e.preventDefault();measure();window.scrollTo({top:layout.top+layout.travel*.99,behavior:'instant'});render();});
 addEventListener('scroll',schedule,{passive:true});
 addEventListener('resize',()=>{measure();schedule();});
 addEventListener('pageshow',()=>{measure();render();});
